@@ -1,0 +1,55 @@
+// table サンプル
+CREATE TABLE `contents` (
+  `id` bigint(20) unsigned NOT NULL auto_increment,
+  `title` varchar(64) default NULL,
+  `body` text,
+  `status` tinyint(4) NOT NULL default '1' COMMENT '公開・非公開(0:無効 1:有効)',
+  `published` datetime NOT NULL COMMENT '公開日時',
+  `unpublished` datetime NOT NULL COMMENT '非公開日時',
+  `created` datetime NOT NULL COMMENT '登録日時',
+  `modified` datetime NOT NULL COMMENT '更新日時',
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+
+
+// ビュー登録部分
+<?php echo $form->input('Content.published_date', array('type' => 'text', 'label' => '公開日時(日付)', 'maxLength' => 10, 'error' => false, 'class' => 'xlarge span3 datepicker', 'style' => 'ime-mode: disabled')); ?>
+<?php echo $form->input('Content.published_time', array('type' => 'text', 'label' => '公開日時(時間)', 'maxLength' => 8, 'error' => false, 'class' => 'xlarge span3', 'style' => 'ime-mode: disabled')); ?>
+
+<?php echo $form->input('Content.unpublished_date', array('type' => 'text', 'label' => '非公開日時(日時)', 'maxLength' => 10, 'error' => false, 'class' => 'xlarge span3 datepicker', 'style' => 'ime-mode: disabled')); ?>
+<?php echo $form->input('Content.unpublished_time', array('type' => 'text', 'label' => '非公開日時(時間)', 'maxLength' => 8, 'error' => false, 'class' => 'xlarge span3', 'style' => 'ime-mode: disabled')); ?>
+
+
+// コントローラadd
+<?php
+class ContentsController extends AppController {
+
+	var $uses = array('Content');
+
+	function add() {
+		$this->Content->Behaviors->attach('Schedule');
+		
+		if (!empty($this->data)) {
+			$this->Content->create();
+			
+			if ($this->Content->save($this->data)) {
+			    $this->redirect(array('action' => 'index'));
+			}
+			
+		}
+	}
+}
+?>
+
+// find
+<?php
+class ContentsController extends AppController {
+
+	var $uses = array('Content');
+
+	function index() {
+		$this->Content->Behaviors->attach('Schedule');
+		$contents = $this->Content->find('all');
+	}
+}
+?>
